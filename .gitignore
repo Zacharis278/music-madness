@@ -1,0 +1,8 @@
+.build/
+.idea/
+.aws
+
+.terraform/
+/manifests/.terraform/
+node_modules
+terraformState.json
