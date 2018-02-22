@@ -14,9 +14,9 @@ build() {
 }
 
 
-plan() {
+deploy() {
 
-    echo "DOIN"
+    echo -e "\n########## Running Deployment ##########\n"
 
     cd manifests
 
@@ -32,8 +32,7 @@ plan() {
     cp -r .terraform/ ../.terraform/
     cd ../
 
-
-    terraform plan \
+    terraform apply \
       -var-file=manifests/variables/dev.tfvars \
       -var="resource_prefix=mm" \
       -refresh=true \
