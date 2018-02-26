@@ -13,7 +13,10 @@ resource "aws_lambda_function" "app" {
   timeout = 60
 
   environment = {
-    variables = "${var.lambda_env_config}"
+    variables = {
+      SPOTIFY_CLIENT_ID = "${var.spotify_clientid}"
+      SPOTIFY_SECRET = "${var.spotify_secret}"
+    }
   }
 }
 

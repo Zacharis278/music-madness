@@ -1,0 +1,9 @@
+{
+  "name": "music-madness-api",
+  "version": "0.0.1",
+  "author": "zhancock",
+  "license": "ISC",
+  "dependencies": {
+    "request-promise-native": "^1.0.5"
+  }
+}

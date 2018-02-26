@@ -35,6 +35,8 @@ deploy() {
     terraform apply \
       -var-file=manifests/variables/dev.tfvars \
       -var="resource_prefix=mm" \
+      -var="spotify_clientid=${CLIENT_ID}" \
+      -var="spotify_secret=${SECRET}" \
       -refresh=true \
       -parallelism=2 \
       manifests/

@@ -14,6 +14,14 @@ variable "lambda_env_config" {
   type = "map"
 }
 
+variable "spotify_clientid" {
+  type = "string"
+}
+
+variable "spotify_secret" {
+  type = "string"
+}
+
 variable "rest_api_title" {
   type = "string"
 }
