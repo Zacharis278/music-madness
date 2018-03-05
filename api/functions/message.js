@@ -7,8 +7,8 @@ exports.handler = function(event, context, callback) {
       let message = body.message;
 
       bracketService.generateBracket(message).then((res) => {
-          console.log(res);
-          console.log(res.length);
+          //console.log(res);
+          //console.log(res.length);
           callback(null, {
               statusCode: '200',
               body: JSON.stringify(res),

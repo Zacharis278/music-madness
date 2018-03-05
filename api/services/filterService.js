@@ -21,7 +21,7 @@ function filterAlbums(albums) {
             albums.splice(i, 1);
             i--;
         } else {
-            album.wordMap = album.name.split(' ');  // map words for comparing titles next
+            album.wordMap = album.name.replace(/[()]/g, '').split(' ');  // map words for comparing titles next
         }
     }
 
@@ -47,6 +47,8 @@ function filterAlbums(albums) {
 
     console.log('Purged Similar and Live Albums:');
     console.log(purgedAlbums);
+    console.log('\n Remaining Albums');
+    albums.forEach((a) => console.log(a.name));
     return albums;
 }
 
