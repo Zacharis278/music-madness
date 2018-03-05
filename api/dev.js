@@ -9,6 +9,6 @@ let event = {
 };
 
 main.handler(event, null, (err, res) => {
-    console.log(res);
-    console.log(res.length);
+    let data = JSON.parse(res.body);
+    fs.writeFile('../bracket/bracket.json', JSON.stringify({teams: data}, null, 3), 'utf8');
 });
