@@ -4,6 +4,12 @@ set -e
 BACKEND_BUCKET="bucket=music-madness-tf-state"
 BRANCH="master"
 
+workflow() {
+    echo -e "\n########## Starting Workflow ##########\n"
+    build
+    deploy
+}
+
 build() {
     echo -e "\n########## Starting API Build ##########\n"
 
