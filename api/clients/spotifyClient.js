@@ -33,6 +33,7 @@ function authorize() {
         json: true
     };
 
+    console.log('SpotifyClient Authorizing');
     return request.post(options).then((res) =>  {
         token.value = res.access_token;
 
@@ -57,6 +58,7 @@ function getAlbums(artistId) {
             }
         };
 
+        console.log('SpotifyClient getAlbums: ' + JSON.stringify(options));
         return request.get(options).then((res) => {
             let data = JSON.parse(res);
 
@@ -72,7 +74,7 @@ function getAlbums(artistId) {
     }).then((albums) => {  // get tracks on each album
         let futures = albums.map((album) => {
 
-            options = {
+            let options = {
                 url: `https://api.spotify.com/v1/albums/${album.id}/tracks`,
                 headers: {
                     'Authorization': 'Bearer ' + token.value
@@ -84,6 +86,7 @@ function getAlbums(artistId) {
                 }
             };
 
+            console.log('SpotifyClient getTracks: ' + JSON.stringify(options));
             return request.get(options).then((res) => {
                 return {
                     id: album.id,
@@ -108,6 +111,7 @@ function getAlbums(artistId) {
                 }
             };
 
+            console.log('SpotifyClient getTracksDetails: ' + JSON.stringify(options));
             return request.get(options).then((res) => {
                 return {
                     id: album.id,
@@ -139,6 +143,7 @@ function findArtist(term) {
             }
         };
 
+        console.log('SpotifyClient searchArtist: ' + JSON.stringify(options));
         return request.get(options).then((res) => {
             let data = JSON.parse(res);
 
