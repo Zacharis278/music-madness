@@ -13,7 +13,9 @@
 
         $('#bracket').bracket({
             init: bracketData,
-            teamWidth: 400
+            teamWidth: 250,
+            matchMargin: 5,
+            roundMargin: 20
         })
     };
 

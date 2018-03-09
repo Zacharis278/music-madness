@@ -1,0 +1,47 @@
+{
+  "text": "New bracket has been requested!\n*Artist* ${artist}\n*Added By* ${user}\n*Runtime* ${runtime}\n     ${link}",
+  "attachments": [
+    {
+      "text": "",
+      "color": "#3AA3E3",
+      "attachment_type": "default",
+      "actions": [
+        {
+          "name": "vote",
+          "text": "Approve",
+          "type": "button",
+          "style": "primary",
+          "value": "approve"
+        },
+        {
+          "name": "vote",
+          "text": "Shuffle",
+          "type": "button",
+          "value": "shuffle"
+        },
+        {
+          "name": "vote",
+          "text": "Make shorter",
+          "type": "button",
+          "value": "shorter"
+        },
+        {
+          "name": "vote",
+          "text": "Veto",
+          "style": "danger",
+          "type": "button",
+          "value": "veto",
+          "confirm": {
+            "title": "Are you sure?",
+            "text": "If you are the submitter this will remove the nomination",
+            "ok_text": "Yes",
+            "dismiss_text": "No"
+          }
+        }
+      ]
+    },
+    {
+      "text": "vetoed by: @dingus, @dongus, @doofus\nvotes to shuffle: @donnieboy"
+    }
+  ]
+}

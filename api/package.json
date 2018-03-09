@@ -4,6 +4,7 @@
   "author": "zhancock",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.207.0",
     "request-promise-native": "^1.0.5"
   }
 }

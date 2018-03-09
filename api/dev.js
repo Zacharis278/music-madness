@@ -1,7 +1,7 @@
 const main = require('./functions/message');
 const fs = require('fs');
 
-let input = 'Relic of Apollo';
+let input = 'nominate Blink-182';
 
 // let event = {
 //     body: JSON.stringify({

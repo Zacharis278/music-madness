@@ -11,7 +11,7 @@ function generateBracket(searchTerm, limit) {
         return spotifyClient.getAlbums(artist.id).then((albums) => {
 
             // go with simple bracket structure right now (no back reference)
-            let bracket = [];
+            let teams = [];
             let bracketEntries = [];
             let popularityMap = {};
             filterService.filterAlbums(albums).forEach((album) => {
@@ -41,14 +41,14 @@ function generateBracket(searchTerm, limit) {
             for(let i = 0; i < bracketEntries.length;) {
 
                 if (numByes > 0) {
-                    bracket.push([
+                    teams.push([
                         bracketEntries[i],
                         null
                     ]);
                     i++;
                     numByes--;
                 } else {
-                    bracket.push([
+                    teams.push([
                         bracketEntries[i],
                         bracketEntries[i+1]
                     ]);
@@ -56,7 +56,7 @@ function generateBracket(searchTerm, limit) {
                 }
             }
 
-            return bracket;
+            return {teams: teams};
         });
     });
 }
