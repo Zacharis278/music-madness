@@ -22,6 +22,10 @@ variable "spotify_secret" {
   type = "string"
 }
 
+variable "slack_token" {
+  type = "string"
+}
+
 variable "rest_api_title" {
   type = "string"
 }

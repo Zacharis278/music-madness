@@ -61,10 +61,6 @@ function generateBracket(searchTerm, limit) {
     });
 }
 
-function cullLeastPopular(entries) {
-
-}
-
 function shuffle(a) {
     let j, x, i;
     for (i = a.length - 1; i > 0; i--) {

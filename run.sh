@@ -43,10 +43,20 @@ deploy() {
       -var="resource_prefix=mm" \
       -var="spotify_clientid=${CLIENT_ID}" \
       -var="spotify_secret=${SECRET}" \
+      -var="slack_token=${SLACK_TOKEN}" \
       -refresh=true \
       -parallelism=2 \
       manifests/
 
+    terraform apply \
+      -var-file=manifests/variables/dev.tfvars \
+      -var="resource_prefix=mm" \
+      -var="spotify_clientid=${CLIENT_ID}" \
+      -var="spotify_secret=${SECRET}" \
+      -var="slack_token=${SLACK_TOKEN}" \
+      -refresh=true \
+      -parallelism=2 \
+      manifests/
 }
 
 for ARG in "$@"; do

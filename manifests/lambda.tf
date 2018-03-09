@@ -16,6 +16,7 @@ resource "aws_lambda_function" "app" {
     variables = {
       SPOTIFY_CLIENT_ID = "${var.spotify_clientid}"
       SPOTIFY_SECRET = "${var.spotify_secret}"
+      SLACK_TOKEN = "${var.slack_token}"
     }
   }
 }
