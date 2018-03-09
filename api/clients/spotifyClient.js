@@ -99,6 +99,7 @@ function getAlbums(artistId) {
         return Promise.all(futures);
     }).then((albums) => {   // get details for each track (popularity value)
 
+        // TODO: can likely improve performance here by collapsing these into a single request and aggregating back to the album
         let futures = albums.map((album) => {
 
             let options = {
