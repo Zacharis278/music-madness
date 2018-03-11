@@ -1,5 +1,5 @@
 const bracketService = require('./bracketService');
-const tournyService = require('./tourneyService');
+const managerService = require('./managerService');
 const { WebClient } = require('@slack/client');
 const web = new WebClient(process.env.SLACK_TOKEN);
 
@@ -16,12 +16,23 @@ module.exports = {
 
 function nominateArtist(searchTerm, userId) {
 
-    bracketService.generateBracket(searchTerm).then((res) => {
+    console.log('NominateArtist: ' + searchTerm);
+    managerService.nominationsOpen()
+    .then((nominationsOpen) => {
+        console.log('Nominations: ' + nominationsOpen);
+        if (!nominationsOpen) {
 
-        //let response = JSON.stringify(res, null, 3);
-        //console.log(response);
-
-        tournyService.saveNomination(res, 'testuser');
+            let message = "Why don't you calm down and have a seat over there.\nThere's an active nomination, wait your goddamn turn";
+            return web.chat.postEphemeral(CHANNEL_ID, message, userId).then(() => Promise.reject('Nominations Closed'));
+        }
+    })
+    .then(() => {
+        return bracketService.generateTeams(searchTerm)
+    })
+    .then((bracket) => {
+        return managerService.createNomination(userId, searchTerm, bracket);
+    })
+    .then(() => {
 
         let params = {
             artist: searchTerm, //WRONG
@@ -29,19 +40,13 @@ function nominateArtist(searchTerm, userId) {
             user: `<@${userId}>`,
             link: BRACKET_URL
         };
-        console.log('1');
         let response = magic(nominateTemplate, params);
-        console.log('2');
 
-        web.chat.postMessage(CHANNEL_ID, response.text, {attachments: response.attachments})
-            .then((res) => {
-                // `res` contains information about the posted message
-                console.log('Message sent: ', res.ts);
-            })
-            .catch((e) => {
-                console.error(e);
-            });
+        return web.chat.postMessage(CHANNEL_ID, response.text, {attachments: response.attachments});
+    }).catch((e) => {
+        console.log('BotService Error: ' + JSON.stringify(e));
     });
+
 }
 
 function magic(o, a) {

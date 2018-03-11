@@ -13,7 +13,7 @@
     {
       "Effect": "Allow",
       "Action": ["s3:ListBucket"],
-      "Resource": ["arn:aws:s3:::mm-www"]
+      "Resource": ["arn:aws:s3:::${resource_prefix}-www"]
     },
     {
       "Effect": "Allow",
@@ -22,7 +22,16 @@
         "s3:GetObject",
         "s3:DeleteObject"
       ],
-      "Resource": ["arn:aws:s3:::mm-www/*"]
+      "Resource": ["arn:aws:s3:::${resource_prefix}-www/*"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:*"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:${aws_region}:${aws_account_id}:table/Tournaments"
+      ]
     }
   ]
 }

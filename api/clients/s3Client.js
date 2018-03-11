@@ -1,21 +1,21 @@
 const AWS = require('aws-sdk');
-var s3 = new AWS.S3();
+const s3 = new AWS.S3();
 
 module.exports = {
-    saveNomination: saveNomination
+    uploadNomination: uploadNomination
 };
 
-function saveNomination(bracket, user) {
+function uploadNomination(tourney) {
     let params = {
-        Body: JSON.stringify(bracket),
+        Body: JSON.stringify({teams:tourney.teams}),
         Bucket: "mm-www",
         Key: "bracket.json"
     };
 
-    return new Promise((reject, resolve) => {
+    return new Promise((resolve, reject) => {
 
         console.log('saving to s3');
-        s3.putObject(params, function(err, data) {
+        s3.putObject(params, function(err) {
             if (err) {
                 console.log(err, err.stack);
                 reject(err);
@@ -24,5 +24,5 @@ function saveNomination(bracket, user) {
                 resolve();
             }
         });
-    })
+    });
 }

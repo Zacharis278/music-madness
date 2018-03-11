@@ -2,10 +2,10 @@ let spotifyClient = require('../clients/spotifyClient');
 let filterService = require('./filterService');
 
 module.exports = {
-    generateBracket: generateBracket
+    generateTeams: generateTeams
 };
 
-function generateBracket(searchTerm, limit) {
+function generateTeams(searchTerm, limit) {
     return spotifyClient.findArtist(searchTerm).then((artist) => {
 
         return spotifyClient.getAlbums(artist.id).then((albums) => {
@@ -56,7 +56,7 @@ function generateBracket(searchTerm, limit) {
                 }
             }
 
-            return {teams: teams};
+            return teams;
         });
     });
 }

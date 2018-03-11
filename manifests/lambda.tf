@@ -17,6 +17,7 @@ resource "aws_lambda_function" "app" {
       SPOTIFY_CLIENT_ID = "${var.spotify_clientid}"
       SPOTIFY_SECRET = "${var.spotify_secret}"
       SLACK_TOKEN = "${var.slack_token}"
+      DYNAMO_ENDPOINT = "${var.lambda_env_config["DYNAMO_ENDPOINT"]}"
     }
   }
 }
