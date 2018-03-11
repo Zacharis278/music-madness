@@ -6,6 +6,7 @@ module.exports = {
     calculateRuntimeDays: calculateRuntimeDays
 };
 
+// TODO: WHAT IF WE SEED INITIAL MATCHUPS BY POPULARITY
 function generateTeams(searchTerm, limit) {
     return spotifyClient.findArtist(searchTerm).then((artist) => {
 

@@ -11,7 +11,8 @@ const BRACKET_URL = 'http://mm-www.s3-website-us-east-1.amazonaws.com/';
 const CHANNEL_ID = 'C9K08UKHB';
 
 module.exports = {
-    nominateArtist: nominateArtist
+    nominateArtist: nominateArtist,
+    handleNominationAction: handleNominationAction
 };
 
 function nominateArtist(searchTerm, userId) {
@@ -49,6 +50,53 @@ function nominateArtist(searchTerm, userId) {
         console.log('BotService Error: ' + JSON.stringify(e));
     });
 
+}
+
+function handleNominationAction(event) {
+
+    let userId = event.user.id;
+    let attachments = event.original_message.attachments;
+    let vote = event.actions[0].value; // brittle.. but fuck it for now
+
+    let submitter = event.original_message.text.match(/<@(\w*)>/)[1]; // janky but prevents DB call to get original submission
+
+    //if (userId === submitter) {
+
+    //} else {
+        nominationVote(event, userId, vote, attachments);
+    //}
+}
+
+
+// Private
+
+function nominationVote(event, userId, vote, attachments) {
+    let updatedExisting = false;
+    let alreadyVoted = false;
+    attachments.forEach((attachment) => {
+
+        // simple way to prevent double voting, eventually store votes in db
+        if (attachment.text && attachment.text.includes(`<@${userId}>`)) {
+            alreadyVoted = true;
+        }
+
+        if (attachment.callback_id === vote) {
+            attachment.text += `,<@${userId}>`;
+            updatedExisting = true;
+        }
+    });
+
+    if (alreadyVoted) return new Promise.resolve();
+
+    if (!updatedExisting) {
+        let newAttachment = {
+            callback_id: vote,
+            text: `votes to ${vote}: <@${userId}>`
+        };
+        attachments.push(newAttachment);
+    }
+
+    return web.chat.update(event.message_ts, CHANNEL_ID, event.original_message.text, {attachments: attachments});
 }
 
 function magic(o, a) {

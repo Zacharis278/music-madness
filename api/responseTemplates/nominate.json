@@ -5,6 +5,7 @@
       "text": "",
       "color": "#3AA3E3",
       "attachment_type": "default",
+      "callback_id": "nomination_action",
       "actions": [
         {
           "name": "vote",
@@ -21,12 +22,6 @@
         },
         {
           "name": "vote",
-          "text": "Make shorter",
-          "type": "button",
-          "value": "shorter"
-        },
-        {
-          "name": "vote",
           "text": "Veto",
           "style": "danger",
           "type": "button",
@@ -39,9 +34,6 @@
           }
         }
       ]
-    },
-    {
-      "text": "vetoed by: @dingus, @dongus, @doofus\nvotes to shuffle: @donnieboy"
     }
   ]
 }

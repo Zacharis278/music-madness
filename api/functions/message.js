@@ -7,6 +7,14 @@ exports.handler = function(event, context, callback) {
         let slackEvent = qs.parse(event.body);
         console.log(slackEvent);
 
+
+        if (slackEvent.payload) {
+            let interactiveEvent = JSON.parse(slackEvent.payload);
+            console.log(interactiveEvent);
+            botService.handleNominationAction(interactiveEvent);
+            return;
+        }
+
         // cost saving measure for development.  save dem PENNIES $$$$
         // if (!slackEvent.isLocaldev) {
         //     setTimeout(() => {
@@ -15,10 +23,11 @@ exports.handler = function(event, context, callback) {
         // }
 
         let tokens = slackEvent.text.split(' ');
+        let promise;
 
         switch (tokens[0]) {
             case 'nominate':
-                botService.nominateArtist(tokens[1], slackEvent.user_id);
+                promise = botService.nominateArtist(tokens[1], slackEvent.user_id);
                 break;
             case 'standings':
                 break;
@@ -27,6 +36,10 @@ exports.handler = function(event, context, callback) {
             default:
                 // help
         }
+
+        promise.then(() => {
+            callback(null, '200 OK');
+        });
 
         // OK so in order for this to respond right away we will have to call the bracket functions as
         // a separate worker.
