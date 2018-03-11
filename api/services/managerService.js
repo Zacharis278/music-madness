@@ -29,6 +29,8 @@ function createNomination(user, artist, teams) {
         teams: teams
     });
 
-    return dynamoClient.storeTourney(tourney).then(s3Client.uploadNomination);
+    return dynamoClient.storeTourney(tourney).then(s3Client.uploadNomination).then(() => {
+        return tourney;
+    });
 
 }

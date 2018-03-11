@@ -29,14 +29,16 @@ function nominateArtist(searchTerm, userId) {
     .then(() => {
         return bracketService.generateTeams(searchTerm)
     })
-    .then((bracket) => {
-        return managerService.createNomination(userId, searchTerm, bracket);
+    .then((teams) => {
+        return managerService.createNomination(userId, searchTerm, teams);
     })
-    .then(() => {
+    .then((tourney) => {
+
+        let runtimeMsg = `${tourney.teams.length} matchups over ${bracketService.calculateRuntimeDays(tourney.teams.length)} days`;
 
         let params = {
             artist: searchTerm, //WRONG
-            runtime: '36 days',
+            runtime: runtimeMsg,
             user: `<@${userId}>`,
             link: BRACKET_URL
         };

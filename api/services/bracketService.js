@@ -2,7 +2,8 @@ let spotifyClient = require('../clients/spotifyClient');
 let filterService = require('./filterService');
 
 module.exports = {
-    generateTeams: generateTeams
+    generateTeams: generateTeams,
+    calculateRuntimeDays: calculateRuntimeDays
 };
 
 function generateTeams(searchTerm, limit) {
@@ -23,9 +24,8 @@ function generateTeams(searchTerm, limit) {
                 });
             });
 
-
-            if (!limit) limit = nearestPow2(bracketEntries.length);
-
+            // limit to 64 initial matchups for now
+            if (!limit) limit = Math.min(nearestPow2(bracketEntries.length), 128);
 
             if (bracketEntries.length > limit) {
                 //cullLeastPopular(bracketEntries, limit);
@@ -61,6 +61,22 @@ function generateTeams(searchTerm, limit) {
     });
 }
 
+function calculateRuntimeDays(numTeams) {
+
+    // summation of powers of 2 up to 2^n is 2^(n+1)-1
+    // QED cuz I say so, discrete math is in the past
+    // also subtract an extra since 2^0 doesn't count in this case
+    let n = Math.log(numTeams) / Math.log(2);
+    let days = (Math.pow(2,n+1)-2)/2;
+
+    n = Math.log(Math.min(numTeams, 16)) / Math.log(2);
+    days += (Math.pow(2,n+1)-2)/2;
+    return days;
+}
+
+
+
+// Private
 function shuffle(a) {
     let j, x, i;
     for (i = a.length - 1; i > 0; i--) {
@@ -79,16 +95,5 @@ function nearestPow2(n) {
     // Round to nearest power
     if (n & 1 << i-1) { i++; }
     return 1 << i;
-}
-
-function nextPow2(n) {
-    if (n === 0) return 1;
-    n--;
-    n |= n >> 1;
-    n |= n >> 2;
-    n |= n >> 4;
-    n |= n >> 8;
-    n |= n >> 16;
-    return n+1
 }
 
