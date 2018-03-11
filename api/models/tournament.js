@@ -18,4 +18,9 @@ module.exports = class Tournament {
         let now = moment();
         return now.isAfter(moment(this.created).add(NOMINATION_EXPIRES_MINUTES, 'minutes'));
     }
+
+    approve() {
+        this.id = uuidv4();
+        this.approved = true;
+    }
 };

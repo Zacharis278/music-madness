@@ -1,3 +1,4 @@
+const moment = require('moment');
 const bracketService = require('./bracketService');
 const managerService = require('./managerService');
 const { WebClient } = require('@slack/client');
@@ -18,7 +19,7 @@ module.exports = {
 function nominateArtist(searchTerm, userId) {
 
     console.log('NominateArtist: ' + searchTerm);
-    managerService.nominationsOpen()
+    return managerService.nominationsOpen()
     .then((nominationsOpen) => {
         console.log('Nominations: ' + nominationsOpen);
         if (!nominationsOpen) {
@@ -60,11 +61,35 @@ function handleNominationAction(event) {
 
     let submitter = event.original_message.text.match(/<@(\w*)>/)[1]; // janky but prevents DB call to get original submission
 
-    //if (userId === submitter) {
+    if (userId === submitter) {
 
-    //} else {
+        if (vote === 'approve') {
+            managerService.approveCurrentNomination().then((tourney) => {
+                console.log('whats up');
+                let runtimeMsg = `${tourney.teams.length} matchups over ${bracketService.calculateRuntimeDays(tourney.teams.length)} days`;
+                let text = `New bracket has been added to the queue!\n*Artist* ${tourney.artist}\n*Added By* <@${tourney.user}>\n*Runtime* ${runtimeMsg}\n${BRACKET_URL}\n\n    _for queue details use \`/bot queue\`_`;
+                return web.chat.postMessage(CHANNEL_ID, text).then(() => {
+                    return web.chat.update(event.message_ts, CHANNEL_ID, event.original_message.text, {attachments: []});
+                })
+            });
+        }
+        else if (vote === 'shuffle') {
+            managerService.randomizeNomination().then(() => {
+                let now = moment();
+                let text = `_shuffled at ${now.format('HH:MM:SS')} by submitter_`;
+                return web.chat.update(event.message_ts, CHANNEL_ID, event.original_message.text + '\n' + text);
+            });
+        }
+        else if (vote === 'veto') {
+            managerService.withdrawNomination().then(() => {
+                let text = `*nomination withdrawn by submitter*`;
+                return web.chat.update(event.message_ts, CHANNEL_ID, event.original_message.text + '\n' + text, {attachments: []});
+            });
+        }
+
+    } else {
         nominationVote(event, userId, vote, attachments);
-    //}
+    }
 }
 
 

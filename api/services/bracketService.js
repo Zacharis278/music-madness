@@ -3,7 +3,8 @@ let filterService = require('./filterService');
 
 module.exports = {
     generateTeams: generateTeams,
-    calculateRuntimeDays: calculateRuntimeDays
+    calculateRuntimeDays: calculateRuntimeDays,
+    shuffleTeams: shuffleTeams
 };
 
 // TODO: WHAT IF WE SEED INITIAL MATCHUPS BY POPULARITY
@@ -36,7 +37,7 @@ function generateTeams(searchTerm, limit) {
                 bracketEntries.length = limit;
             }
 
-            shuffle(bracketEntries);
+            shuffleTeams(bracketEntries);
 
             let numByes = limit - bracketEntries.length;
             for(let i = 0; i < bracketEntries.length;) {
@@ -75,10 +76,7 @@ function calculateRuntimeDays(numTeams) {
     return days;
 }
 
-
-
-// Private
-function shuffle(a) {
+function shuffleTeams(a) {
     let j, x, i;
     for (i = a.length - 1; i > 0; i--) {
         j = Math.floor(Math.random() * (i + 1));
@@ -88,6 +86,9 @@ function shuffle(a) {
     }
 }
 
+
+
+// Private
 function nearestPow2(n) {
     let m = n;
     for(var i = 0; m > 1; i++) {

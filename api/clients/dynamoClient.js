@@ -10,7 +10,8 @@ const Tournament = require('../models/tournament');
 
 module.exports = {
     storeTourney: storeTourney,
-    getTourneyById: getTourneyById
+    getTourneyById: getTourneyById,
+    deleteTourneyById: deleteTourneyById
 };
 
 function storeTourney(tourney) {
@@ -18,8 +19,9 @@ function storeTourney(tourney) {
         TableName: 'Tournaments',
         Item: {
             "id": tourney.id,
-            "type": tourney.artist,
+            "type": 'artist',
             "user": tourney.user,
+            "artist": tourney.artist,
             "name": tourney.artist,
             "teams": tourney.teams,
             "created": tourney.created
@@ -44,6 +46,29 @@ function getTourneyById(id) {
             return new Tournament(data.Item);
         }
     });
+}
+
+function deleteTourneyById(id) {
+
+    let params = {
+        TableName: 'Tournaments',
+        Key: {
+            "id": id
+        }
+    };
+
+    return new Promise((resolve, reject) => {
+        console.log("DynamoClient deleteItem: " + JSON.stringify(params));
+        docClient.delete(params, function(err) {
+            if (err) {
+                console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
+                reject(err);
+            } else {
+                console.log("DeleteItem succeeded");
+                resolve();
+            }
+        });
+    })
 }
 
 function get(params) {
