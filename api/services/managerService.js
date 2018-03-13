@@ -10,7 +10,8 @@ module.exports = {
     createNomination: createNomination,
     approveCurrentNomination: approveCurrentNomination,
     randomizeNomination: randomizeNomination,
-    withdrawNomination: withdrawNomination
+    withdrawNomination: withdrawNomination,
+    getBacklog: getBacklog
 };
 
 function nominationsOpen() {
@@ -65,5 +66,11 @@ function randomizeNomination() {
 function withdrawNomination() {
     return dynamoClient.deleteTourneyById(CURRENT_NOMINATION_ID).then(() => {
         // upload a "nothing in progress" view to s3?
+    });
+}
+
+function getBacklog() {
+    return dynamoClient.getQueuedTournys((tournys) => {
+        return tournys;
     });
 }

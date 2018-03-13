@@ -13,8 +13,31 @@ const CHANNEL_ID = 'C9K08UKHB';
 
 module.exports = {
     nominateArtist: nominateArtist,
-    handleNominationAction: handleNominationAction
+    handleNominationAction: handleNominationAction,
+    postQueue: postQueue
 };
+
+function postQueue() {
+    return managerService.getBacklog().then((tournys) => {
+
+        let message = `*Tournament Backlog*\n${tournys.length} items`;
+        let discogMessage = "_Discographies_\n";
+
+        if (tournys && tournys.length) {
+            tournys.forEach((t) => discogMessage += `${t.artist}  • created by <@${t.user}>`);
+
+            var attachments =  [
+                {
+                    "text": discogMessage,
+                    "mrkdwn_in": ["text"]
+                }
+            ];
+        }
+
+
+        return web.chat.postMessage(CHANNEL_ID, message, {attachments: attachments});
+    });
+}
 
 function nominateArtist(searchTerm, userId) {
 
@@ -44,7 +67,7 @@ function nominateArtist(searchTerm, userId) {
             user: `<@${userId}>`,
             link: BRACKET_URL
         };
-        let response = magic(nominateTemplate, params);
+        let response = interpolateJSON(nominateTemplate, params);
 
         return web.chat.postMessage(CHANNEL_ID, response.text, {attachments: response.attachments});
     }).catch((e) => {
@@ -61,7 +84,8 @@ function handleNominationAction(event) {
 
     let submitter = event.original_message.text.match(/<@(\w*)>/)[1]; // janky but prevents DB call to get original submission
 
-    event.original_message.text.replace(/<http|\/>/g, ''); // remove slack's url escape
+    event.original_message.text = event.original_message.text.replace('/>', ''); // remove slack's url escape
+    event.original_message.text = event.original_message.text.replace('<http', 'http');
 
     if (userId === submitter) {
 
@@ -126,7 +150,7 @@ function nominationVote(event, userId, vote, attachments) {
     return web.chat.update(event.message_ts, CHANNEL_ID, event.original_message.text, {attachments: attachments});
 }
 
-function magic(o, a) {
+function interpolateJSON(o, a) {
     let j = JSON.stringify(o);
     for (let k in a) {
         j = j.split('${'+k+'}').join(a[k]);

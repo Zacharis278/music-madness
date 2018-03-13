@@ -11,7 +11,8 @@ const Tournament = require('../models/tournament');
 module.exports = {
     storeTourney: storeTourney,
     getTourneyById: getTourneyById,
-    deleteTourneyById: deleteTourneyById
+    deleteTourneyById: deleteTourneyById,
+    getQueuedTournys: getQueuedTournys
 };
 
 function storeTourney(tourney) {
@@ -71,6 +72,40 @@ function deleteTourneyById(id) {
     })
 }
 
+function getQueuedTournys() {
+
+    let params = {
+        TableName: 'Tournaments',
+        ProjectionExpression: "artist, #usr",
+        FilterExpression: "id <> :active_nomination",
+        ExpressionAttributeNames: {
+            "#usr": "user",
+        },
+        ExpressionAttributeValues: {
+            ':active_nomination': 'CURRENT_NOMINATION'
+        }
+    };
+
+    return scan(params).then((data) => {
+        return data.Items;
+    });
+}
+
+function scan(params) {
+    return new Promise((resolve, reject) => {
+        console.log("DynamoClient scan: " + JSON.stringify(params));
+        docClient.scan(params, function(err, data) {
+            if (err) {
+                console.error("Unable to scan. Error JSON:", JSON.stringify(err, null, 2));
+                reject(err);
+            } else {
+                console.log("scan succeeded:", JSON.stringify(data, null, 2));
+                resolve(data);
+            }
+        });
+    })
+}
+
 function get(params) {
     return new Promise((resolve, reject) => {
         console.log("DynamoClient getItem: " + JSON.stringify(params));
@@ -83,7 +118,7 @@ function get(params) {
                 resolve(data);
             }
         });
-    })
+    });
 }
 
 function put(params) {

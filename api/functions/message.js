@@ -15,23 +15,17 @@ exports.handler = function(event, context, callback) {
             return;
         }
 
-        // cost saving measure for development.  save dem PENNIES $$$$
-        // if (!slackEvent.isLocaldev) {
-        //     setTimeout(() => {
-        //         process.exit(0);
-        //     }, 2800);
-        // }
-
         let tokens = slackEvent.text.split(' ');
         let promise;
 
-        switch (tokens[0]) {
+        switch (tokens.shift()) {
             case 'nominate':
-                promise = botService.nominateArtist(tokens[1], slackEvent.user_id);
+                promise = botService.nominateArtist(tokens.join(' '), slackEvent.user_id);
                 break;
             case 'standings':
                 break;
             case 'queue':
+                promise = botService.postQueue();
                 break;
             default:
                 // help
@@ -39,6 +33,8 @@ exports.handler = function(event, context, callback) {
 
         promise.then(() => {
             callback(null, '200 OK');
+        }).catch((e) => {
+            console.log(e);
         });
 
         // OK so in order for this to respond right away we will have to call the bracket functions as
