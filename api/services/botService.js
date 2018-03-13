@@ -61,6 +61,8 @@ function handleNominationAction(event) {
 
     let submitter = event.original_message.text.match(/<@(\w*)>/)[1]; // janky but prevents DB call to get original submission
 
+    event.original_message.text.replace(/<http|\/>/g, ''); // remove slack's url escape
+
     if (userId === submitter) {
 
         if (vote === 'approve') {
