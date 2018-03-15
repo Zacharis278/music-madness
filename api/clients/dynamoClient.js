@@ -76,7 +76,7 @@ function getQueuedTournys() {
 
     let params = {
         TableName: 'Tournaments',
-        ProjectionExpression: "artist, #usr",
+        ProjectionExpression: "id, artist, #usr",
         FilterExpression: "id <> :active_nomination",
         ExpressionAttributeNames: {
             "#usr": "user",

@@ -5,6 +5,7 @@ const { WebClient } = require('@slack/client');
 const web = new WebClient(process.env.SLACK_TOKEN);
 
 const nominateTemplate = require('../responseTemplates/nominate');
+const newTournamentTemplate = require('../responseTemplates/newTournament');
 
 // configure this later
 const BRACKET_URL = 'http://mm-www.s3-website-us-east-1.amazonaws.com/';
@@ -14,7 +15,8 @@ const CHANNEL_ID = 'C9K08UKHB';
 module.exports = {
     nominateArtist: nominateArtist,
     handleNominationAction: handleNominationAction,
-    postQueue: postQueue
+    postQueue: postQueue,
+    postNewTourney: postNewTourney
 };
 
 function postQueue() {
@@ -116,6 +118,19 @@ function handleNominationAction(event) {
     } else {
         nominationVote(event, userId, vote, attachments);
     }
+}
+
+function postNewTourney(tourney) {
+    let params = {
+        name: tourney.name,
+        tracks: tourney.teams.length*2,
+        days: bracketService.calculateRuntimeDays(tourney.teams.length),
+        user: `<@${tourney.user}>`,
+        link: BRACKET_URL
+    };
+    let response = interpolateJSON(newTournamentTemplate, params);
+
+    return web.chat.postMessage(CHANNEL_ID, response.text, {attachments: response.attachments});
 }
 
 

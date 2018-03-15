@@ -1,0 +1,30 @@
+{
+  "text": "New Tournament Day!\n\n*${name}*",
+  "attachments": [
+    {
+      "text": "_Created By_ ${user}\n_Runtime_ ${tracks} tracks over ${days} days\n_Bracket_ ${link}",
+      "mrkdwn_in": ["text"]
+    },
+    {
+      "text": "",
+      "color": "#3AA3E3",
+      "attachment_type": "default",
+      "callback_id": "nomination_action",
+      "actions": [
+        {
+          "name": "vote",
+          "text": "Veto",
+          "style": "danger",
+          "type": "button",
+          "value": "veto",
+          "confirm": {
+            "title": "Are you sure?",
+            "text": "This submission will be _permanently_ removed after 5 votes",
+            "ok_text": "Kill it with Fire!",
+            "dismiss_text": "Never Mind"
+          }
+        }
+      ]
+    }
+  ]
+}

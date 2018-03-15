@@ -1,12 +1,17 @@
 const qs = require('querystring');
 const botService = require('../services/botService');
+const updateService = require('../services/updateService');
 
 exports.handler = function(event, context, callback) {
 
     try {
+        if (event.trigger) {
+            updateService.update();
+            return;
+        }
+
         let slackEvent = qs.parse(event.body);
         console.log(slackEvent);
-
 
         if (slackEvent.payload) {
             let interactiveEvent = JSON.parse(slackEvent.payload);

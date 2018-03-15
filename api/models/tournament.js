@@ -14,6 +14,10 @@ module.exports = class Tournament {
         this.created = obj.created || moment().toISOString()
     }
 
+    setStatus(status) {
+        this.status = status; // who needs enums... (no really you should add that)
+    }
+
     isNominationExpired() {
         let now = moment();
         return now.isAfter(moment(this.created).add(NOMINATION_EXPIRES_MINUTES, 'minutes'));
@@ -21,6 +25,10 @@ module.exports = class Tournament {
 
     approve() {
         this.id = uuidv4();
-        this.approved = true;
+        this.status = 'approved';
+    }
+
+    generateName() {
+        this.name = `The Arby's ${this.artist} Showdown`;
     }
 };
