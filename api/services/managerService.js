@@ -2,7 +2,6 @@ const s3Client = require('../clients/s3Client');
 const dynamoClient = require('../clients/dynamoClient');
 const Tournament = require('../models/tournament');
 const bracketService = require('./bracketService');
-const botService = require('./botService');
 
 const CURRENT_NOMINATION_ID = 'CURRENT_NOMINATION';
 
@@ -78,13 +77,19 @@ function getBacklog() {
 }
 
 function newTournament() {
-    return dynamoClient.getQueuedTournys().then((tournys) => { // pick random
-        let pick = Math.floor(Math.random() * Math.floor(tournys.length-1));
-        return(tournys[pick].id);
-    }).then(dynamoClient.getTourneyById)
-    .then((tourney) => {
-        tourney.generateName();
-        tourney.setStatus('pending');
-        return dynamoClient.storeTourney(tourney);
-    });
+    return dynamoClient.getQueuedTournys()
+        .then((tournys) => { // pick random
+            let pick = Math.floor(Math.random() * Math.floor(tournys.length));
+            return(tournys[pick].id);
+        })
+        .then(dynamoClient.getTourneyById)
+        .then((tourney) => {
+            tourney.generateName();
+            tourney.setStatus('pending');
+            return dynamoClient.storeTourney(tourney)
+                .then(s3Client.uploadNomination)
+                .then(() => {
+                    return tourney;
+                });
+        });
 }

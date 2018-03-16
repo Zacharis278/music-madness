@@ -1,36 +1,25 @@
 const qs = require('querystring');
-const botService = require('../services/botService');
-const updateService = require('../services/updateService');
+const messageService = require('../services/messageService');
+const bracketService = require('../services/bracketService');
+const managerService = require('../services/managerService');
 
 exports.handler = function(event, context, callback) {
 
     try {
-        if (event.trigger) {
-            updateService.update();
-            return;
-        }
-
         let slackEvent = qs.parse(event.body);
         console.log(slackEvent);
-
-        if (slackEvent.payload) {
-            let interactiveEvent = JSON.parse(slackEvent.payload);
-            console.log(interactiveEvent);
-            botService.handleNominationAction(interactiveEvent);
-            return;
-        }
 
         let tokens = slackEvent.text.split(' ');
         let promise;
 
         switch (tokens.shift()) {
             case 'nominate':
-                promise = botService.nominateArtist(tokens.join(' '), slackEvent.user_id);
+                promise = nominateArtist(tokens.join(' '), slackEvent.user_id);
                 break;
             case 'standings':
                 break;
             case 'queue':
-                promise = botService.postQueue();
+                promise = messageService.postQueue();
                 break;
             default:
                 // help
@@ -70,3 +59,24 @@ exports.handler = function(event, context, callback) {
         });
     }
 };
+
+function nominateArtist(searchTerm, userId) {
+    console.log('NominateArtist: ' + searchTerm);
+    return managerService.nominationsOpen()
+        .then((nominationsOpen) => {
+            if (!nominationsOpen) {
+                return messageService.nominationsClosed(userId);
+            }
+        })
+        .then(() => {
+            return bracketService.generateTeams(searchTerm)
+        })
+        .then((teams) => {
+            return managerService.createNomination(userId, searchTerm, teams);
+        })
+        .then((tourney) => {
+            return messageService.postNomination(tourney);
+        }).catch((e) => {
+            console.log('BotService Error: ' + JSON.stringify(e));
+        });
+}

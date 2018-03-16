@@ -1,19 +1,35 @@
-const main = require('./functions/message');
-const fs = require('fs');
+const message = require('./functions/message');
+const action = require('./functions/action');
+const trigger = require('./functions/trigger');
 
-let input = 'queue';
+let input = 'trigger';
 
-// let event = {
-//     body: JSON.stringify({
-//         message: input
-//     })
-// };
+let tokens = input.split(' ');
 
-let nominateEvent = {
+if (tokens[0] === 'nominate' || tokens[0] === 'queue') {
+    message.handler({
+        body: `user_id=U9JP7GWQK&text=${input}`
+    });
+}
+else if (tokens[0] === 'vote') {
+    action.handler({
+        body: `user_id=U9JP7GWQK&payload=${JSON.stringify({
+            original_message: { 
+                text: 'PLACEHOLDER FOR ORIGINAL MSG by <@U9JP7GWQK>',
+                attachments: []
+            },
+            user: { id: 'U9JP7GWQK' },
+            actions: [{
+                value: tokens[1]
+            }],
+            message_ts: null
+        })}`
+    });
+}
+else if (tokens[0] === 'trigger') {
+    trigger.handler();
+}
+
+let event = {
     body: `user_id=U9JP7GWQK&text=${input}`
 };
-
-main.handler(nominateEvent, null, (err, res) => {
-    //let data = JSON.parse(res.body);
-    //fs.writeFile('../bracket/bracket.json', JSON.stringify({teams: data}, null, 3), 'utf8');
-});
