@@ -48,8 +48,8 @@ function postQueue() {
 function postNewTourney(tourney) {
     let params = {
         name: tourney.name,
-        tracks: tourney.teams.length*2,
-        days: bracketService.calculateRuntimeDays(tourney.teams.length),
+        tracks: bracketService.numberOfEntries(tourney.teams),
+        days: bracketService.calculateRuntimeDays(tourney.teams),
         user: `<@${tourney.user}>`,
         link: BRACKET_URL
     };
@@ -59,7 +59,7 @@ function postNewTourney(tourney) {
 }
 
 function postNomination(tourney) {
-    let runtimeMsg = `${tourney.teams.length} matchups over ${bracketService.calculateRuntimeDays(tourney.teams.length)} days`;
+    let runtimeMsg = `${bracketService.numberOfEntries(tourney.teams)} tracks over ${bracketService.calculateRuntimeDays(tourney.teams)} days`;
 
     let params = {
         artist: tourney.artist,
@@ -73,7 +73,7 @@ function postNomination(tourney) {
 }
 
 function nominationApprove(event, tourney) {
-    let runtimeMsg = `${tourney.teams.length} matchups over ${bracketService.calculateRuntimeDays(tourney.teams.length)} days`;
+    let runtimeMsg = `${bracketService.numberOfEntries(tourney.teams)} tracks over ${bracketService.calculateRuntimeDays(tourney.teams.length)} days`;
     let text = `New bracket has been added to the queue!\n*Artist* ${tourney.artist}\n*Added By* <@${tourney.user}>\n*Runtime* ${runtimeMsg}\n${BRACKET_URL}\n\n    _for queue details use \`/bot queue\`_`;
     return web.chat.postMessage(CHANNEL_ID, text).then(() => {
         return web.chat.update(event.message_ts, CHANNEL_ID, event.original_message.text, {attachments: []});

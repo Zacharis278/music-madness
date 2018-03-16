@@ -4,7 +4,8 @@ let filterService = require('./filterService');
 module.exports = {
     generateTeams: generateTeams,
     calculateRuntimeDays: calculateRuntimeDays,
-    shuffleTeams: shuffleTeams
+    shuffleTeams: shuffleTeams,
+    numberOfEntries: numberOfEntries
 };
 
 // TODO: WHAT IF WE SEED INITIAL MATCHUPS BY POPULARITY
@@ -63,17 +64,29 @@ function generateTeams(searchTerm, limit) {
     });
 }
 
-function calculateRuntimeDays(numTeams) {
+function calculateRuntimeDays(teams) {
+
+    let numTeams = teams.length;
 
     // summation of powers of 2 up to 2^n is 2^(n+1)-1
-    // QED cuz I say so, discrete math is in the past
     // also subtract an extra since 2^0 doesn't count in this case
     let n = Math.log(numTeams) / Math.log(2);
     let days = (Math.pow(2,n+1)-2)/2;
 
     n = Math.log(Math.min(numTeams, 16)) / Math.log(2);
     days += (Math.pow(2,n+1)-2)/2;
+
+    // subtract bye rounds
+    teams.forEach((team) => {
+        if (team[1] === null) // dangerously assuming I only set bye on second entry
+            days -= numTeams.length >= 16 ? 2 : 1;
+    });
+
     return days;
+}
+
+function numberOfEntries(teams) {
+    return teams.reduce((acc, t) => t[1] ? acc+2 : acc+1, 0);
 }
 
 function shuffleTeams(a) {
@@ -85,7 +98,6 @@ function shuffleTeams(a) {
         a[j] = x;
     }
 }
-
 
 
 // Private
