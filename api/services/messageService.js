@@ -65,7 +65,9 @@ function postNomination(tourney) {
         artist: tourney.artist,
         runtime: runtimeMsg,
         user: `<@${tourney.user}>`,
-        link: BRACKET_URL
+        link: BRACKET_URL,
+        timestamp: tourney.getExpiry().unix(),
+        dateFallback: tourney.getExpiry().toISOString()
     };
     let response = interpolateJSON(nominateTemplate, params);
 

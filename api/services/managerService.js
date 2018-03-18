@@ -21,7 +21,9 @@ function nominationsOpen() {
         if (tourney) {
             return tourney.isNominationExpired();
         } else {
-            return true;
+            return dynamoClient.deleteTourneyById(CURRENT_NOMINATION_ID).then(() => {
+                return true;
+            });
         }
     });
 }

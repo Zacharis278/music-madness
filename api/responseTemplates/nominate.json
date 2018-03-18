@@ -1,5 +1,5 @@
 {
-  "text": "New bracket has been requested!\n*Artist* ${artist}\n*Added By* ${user}\n*Runtime* ${runtime}\n     ${link}",
+  "text": "New bracket has been requested!\n*Artist* ${artist}\n*Added By* ${user}\n*Runtime* ${runtime}\n     ${link}\n     _expires <!date^${timestamp}^{time_secs}|{dateFallback}>_",
   "attachments": [
     {
       "text": "",

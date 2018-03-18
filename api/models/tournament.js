@@ -18,9 +18,13 @@ module.exports = class Tournament {
         this.status = status; // who needs enums... (no really you should add that)
     }
 
+    getExpiry() {
+        return moment(this.created).add(NOMINATION_EXPIRES_MINUTES, 'minutes');
+    }
+
     isNominationExpired() {
         let now = moment();
-        return now.isAfter(moment(this.created).add(NOMINATION_EXPIRES_MINUTES, 'minutes'));
+        return now.isAfter(this.getExpiry());
     }
 
     approve() {
