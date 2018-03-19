@@ -12,7 +12,9 @@ module.exports = {
     storeTourney: storeTourney,
     getTourneyById: getTourneyById,
     deleteTourneyById: deleteTourneyById,
-    getQueuedTournys: getQueuedTournys
+    getQueuedTournys: getQueuedTournys,
+    getTourneysByStatus: getTourneysByStatus,
+    addVeto: addVeto
 };
 
 function storeTourney(tourney) {
@@ -21,10 +23,12 @@ function storeTourney(tourney) {
         Item: {
             "id": tourney.id,
             "type": 'artist',
+            "status": tourney.status,
             "user": tourney.user,
             "artist": tourney.artist,
             "name": tourney.artist,
             "teams": tourney.teams,
+            "vetoes": tourney.vetoes,
             "created": tourney.created
         }
     };
@@ -33,6 +37,25 @@ function storeTourney(tourney) {
         return tourney;
     });
 }
+
+function addVeto(tourneyId, user) {
+    const params = {
+        TableName: 'Tournaments',
+        Key:{
+            "id": tourneyId
+        },
+        UpdateExpression: "SET vetoes = list_append(vetoes, :usr)",
+        ExpressionAttributeValues:{
+            ":usr": [user]
+        },
+        ReturnValues:"UPDATED_NEW"
+    };
+
+    return update(params).then((res) => {
+        return res.Attributes.vetoes;
+    });
+}
+
 
 function getTourneyById(id) {
     let params = {
@@ -88,6 +111,39 @@ function getQueuedTournys() {
 
     return scan(params).then((data) => {
         return data.Items;
+    });
+}
+
+function getTourneysByStatus(status) {
+    let params = {
+        TableName: 'Tournaments',
+        ProjectionExpression: "id, #stus",
+        FilterExpression: "#stus = :by_status",
+        ExpressionAttributeNames: {
+            "#stus": "status"
+        },
+        ExpressionAttributeValues: {
+            ':by_status': status
+        }
+    };
+
+    return scan(params).then((data) => {
+        return data.Items;
+    });
+}
+
+function update(params) {
+    return new Promise((resolve, reject) => {
+        console.log("DynamoClient update: " + JSON.stringify(params));
+        docClient.update(params, function(err, data) {
+            if (err) {
+                console.error("Unable to update. Error JSON:", JSON.stringify(err, null, 2));
+                reject(err);
+            } else {
+                console.log("update succeeded:", JSON.stringify(data, null, 2));
+                resolve(data);
+            }
+        });
     });
 }
 

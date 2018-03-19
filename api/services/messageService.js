@@ -20,7 +20,8 @@ module.exports = {
     nominationApprove: nominationApprove,
     nominationShuffle: nominationShuffle,
     nominationVeto: nominationVeto,
-    nominationVote: nominationVote
+    nominationVote: nominationVote,
+    updateMessage: updateMessage
 };
 
 function postQueue() {
@@ -58,6 +59,10 @@ function postNewTourney(tourney) {
     return web.chat.postMessage(CHANNEL_ID, response.text, {attachments: response.attachments});
 }
 
+function updateMessage(event, attachments) {
+    return web.chat.update(event.message_ts, CHANNEL_ID, event.original_message.text, {attachments: attachments});
+}
+
 function postNomination(tourney) {
     let runtimeMsg = `${bracketService.numberOfEntries(tourney.teams)} tracks over ${bracketService.calculateRuntimeDays(tourney.teams)} days`;
 
@@ -75,7 +80,7 @@ function postNomination(tourney) {
 }
 
 function nominationApprove(event, tourney) {
-    let runtimeMsg = `${bracketService.numberOfEntries(tourney.teams)} tracks over ${bracketService.calculateRuntimeDays(tourney.teams.length)} days`;
+    let runtimeMsg = `${bracketService.numberOfEntries(tourney.teams)} tracks over ${bracketService.calculateRuntimeDays(tourney.teams)} days`;
     let text = `New bracket has been added to the queue!\n*Artist* ${tourney.artist}\n*Added By* <@${tourney.user}>\n*Runtime* ${runtimeMsg}\n${BRACKET_URL}\n\n    _for queue details use \`/bot queue\`_`;
     return web.chat.postMessage(CHANNEL_ID, text).then(() => {
         return web.chat.update(event.message_ts, CHANNEL_ID, event.original_message.text, {attachments: []});
@@ -101,7 +106,9 @@ function nominationsClosed(userId) {
 function nominationVote(event, userId, vote, attachments) {
     let updatedExisting = false;
     let alreadyVoted = false;
-    attachments.forEach((attachment) => {
+    attachments.forEach((attachment, i) => {
+
+        if (i < 1) return; // getting real hacky up in here
 
         // simple way to prevent double voting, eventually store votes in db
         if (attachment.text && attachment.text.includes(`<@${userId}>`)) {
@@ -114,7 +121,7 @@ function nominationVote(event, userId, vote, attachments) {
         }
     });
 
-    if (alreadyVoted) return new Promise.resolve();
+    if (alreadyVoted) return Promise.resolve();
 
     if (!updatedExisting) {
         let newAttachment = {

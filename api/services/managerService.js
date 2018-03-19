@@ -12,7 +12,8 @@ module.exports = {
     randomizeNomination: randomizeNomination,
     withdrawNomination: withdrawNomination,
     getBacklog: getBacklog,
-    newTournament: newTournament
+    newTournament: newTournament,
+    addVeto: addVeto
 };
 
 function nominationsOpen() {
@@ -43,16 +44,18 @@ function createNomination(user, artist, teams) {
 }
 
 function approveCurrentNomination() {
+
+    let result;
     return dynamoClient.getTourneyById(CURRENT_NOMINATION_ID).then((tourney) => {
 
         tourney.approve();
+        result = tourney;
 
         return dynamoClient.storeTourney(tourney).then(() => {
             return dynamoClient.deleteTourneyById(CURRENT_NOMINATION_ID);
-        }).then(() => {
-            console.log('here');
-            return tourney;
         });
+    }).then(() => {
+        return result;
     });
 }
 
@@ -87,11 +90,32 @@ function newTournament() {
         .then(dynamoClient.getTourneyById)
         .then((tourney) => {
             tourney.generateName();
-            tourney.setStatus('pending');
+            tourney.setStatus('active');
             return dynamoClient.storeTourney(tourney)
                 .then(s3Client.uploadNomination)
                 .then(() => {
                     return tourney;
                 });
         });
+}
+
+function addVeto(userId) {
+
+    return dynamoClient.getTourneysByStatus('active').then((tourneys) => {
+        if (tourneys.length !== 1) {
+            console.log('Womp womp only expected 1 active tournament got ' + tourneys.length);
+        }
+        let tourney = tourneys[0];
+
+        return dynamoClient.addVeto(tourney.id, userId).then((vetoes) => {
+
+            if (vetoes.length > 5) {
+                dynamoClient.deleteTourneyById(tourney.id).then(() => {
+                    return; // TODO
+                })
+            } else {
+                return vetoes;
+            }
+        });
+    })
 }

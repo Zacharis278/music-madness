@@ -9,8 +9,10 @@ module.exports = class Tournament {
         this.id = obj.id || uuidv4();
         this.user = obj.user;
         this.artist = obj.artist;
+        this.status = obj.status || 'nominated';
         this.name = obj.name || obj.artist; // for now
         this.teams = obj.teams;
+        this.vetoes = this.vetoes || [];
         this.created = obj.created || moment().toISOString()
     }
 
@@ -30,6 +32,7 @@ module.exports = class Tournament {
     approve() {
         this.id = uuidv4();
         this.status = 'approved';
+        this.vetoes = [];
     }
 
     generateName() {
