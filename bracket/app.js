@@ -7,8 +7,7 @@
         let data = JSON.parse(request.response);
         var bracketData = {
             teams : data.teams,
-            results : [
-            ]
+            results : data.results
         };
 
         $('#bracket').bracket({

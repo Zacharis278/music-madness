@@ -2,20 +2,24 @@ let spotifyClient = require('../clients/spotifyClient');
 let filterService = require('./filterService');
 
 module.exports = {
-    generateTeams: generateTeams,
-    calculateRuntimeDays: calculateRuntimeDays,
+    generateBracket: generateBracket,
     shuffleTeams: shuffleTeams,
-    numberOfEntries: numberOfEntries
 };
 
 // TODO: WHAT IF WE SEED INITIAL MATCHUPS BY POPULARITY
-function generateTeams(searchTerm, limit) {
+function generateBracket(searchTerm, limit) {
     return spotifyClient.findArtist(searchTerm).then((artist) => {
 
         return spotifyClient.getAlbums(artist.id).then((albums) => {
 
-            // go with simple bracket structure right now (no back reference)
-            let teams = [];
+            let bracket = {
+                entries: [],
+                rounds: [
+                    []
+                ]
+            };
+
+
             let bracketEntries = [];
             let popularityMap = {};
             filterService.filterAlbums(albums).forEach((album) => {
@@ -41,32 +45,37 @@ function generateTeams(searchTerm, limit) {
             shuffleTeams(bracketEntries);
 
             let numByes = limit - bracketEntries.length;
+            bracket.totalEntries = bracketEntries.length;
+            bracket.runtimeDays = calculateRuntimeDays(limit, numByes);
+
             for(let i = 0; i < bracketEntries.length;) {
 
                 if (numByes > 0) {
-                    teams.push([
-                        bracketEntries[i],
-                        null
+
+                    bracket.rounds[0].push([
+                        { name: bracketEntries[i], votes: null},
+                        { name: null, votes: null},
                     ]);
+
                     i++;
                     numByes--;
                 } else {
-                    teams.push([
-                        bracketEntries[i],
-                        bracketEntries[i+1]
+
+                    bracket.rounds[0].push([
+                        { name: bracketEntries[i], votes: null},
+                        { name: bracketEntries[i+1], votes: null},
                     ]);
+
                     i+=2
                 }
             }
 
-            return teams;
+            return bracket;
         });
     });
 }
 
-function calculateRuntimeDays(teams) {
-
-    let numTeams = teams.length;
+function calculateRuntimeDays(numTeams, numByes) {
 
     // summation of powers of 2 up to 2^n is 2^(n+1)-1
     // also subtract an extra since 2^0 doesn't count in this case
@@ -77,10 +86,14 @@ function calculateRuntimeDays(teams) {
     days += (Math.pow(2,n+1)-2)/2;
 
     // subtract bye rounds
-    teams.forEach((team) => {
-        if (team[1] === null) // dangerously assuming I only set bye on second entry
-            days -= numTeams.length >= 16 ? 2 : 1;
-    });
+    // teams.forEach((team) => {
+    //     if (team[1] === null) // dangerously assuming I only set bye on second entry
+    //         days -= numTeams.length >= 16 ? 2 : 1;
+    // });
+
+    if (numByes) {
+        days -= numTeams >= 16 ? Math.round(numByes/2) : numByes;
+    }
 
     return days;
 }

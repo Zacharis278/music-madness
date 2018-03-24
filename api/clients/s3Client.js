@@ -6,11 +6,14 @@ module.exports = {
 };
 
 function uploadNomination(tourney) {
+
     let params = {
-        Body: JSON.stringify({teams:tourney.teams}),
+        Body: JSON.stringify({teams:tourney.getTeamsList()}),
         Bucket: "mm-www",
         Key: "bracket.json"
     };
+
+    //return Promise.resolve();
 
     return new Promise((resolve, reject) => {
 

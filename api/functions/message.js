@@ -69,10 +69,10 @@ function nominateArtist(searchTerm, userId) {
             }
         })
         .then(() => {
-            return bracketService.generateTeams(searchTerm)
+            return bracketService.generateBracket(searchTerm)
         })
-        .then((teams) => {
-            return managerService.createNomination(userId, searchTerm, teams);
+        .then((bracket) => {
+            return managerService.createNomination(userId, searchTerm, bracket);
         })
         .then((tourney) => {
             return messageService.postNomination(tourney);

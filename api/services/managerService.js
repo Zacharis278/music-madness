@@ -29,13 +29,13 @@ function nominationsOpen() {
     });
 }
 
-function createNomination(user, artist, teams) {
+function createNomination(user, artist, bracket) {
 
     let tourney = new Tournament({
         id: CURRENT_NOMINATION_ID,
         user: user,
         artist: artist,
-        teams: teams
+        bracket: bracket
     });
 
     return dynamoClient.storeTourney(tourney).then(s3Client.uploadNomination).then(() => {
@@ -62,7 +62,7 @@ function approveCurrentNomination() {
 function randomizeNomination() {
     return dynamoClient.getTourneyById(CURRENT_NOMINATION_ID).then((tourney) => {
 
-        bracketService.shuffleTeams(tourney.teams);
+        bracketService.shuffleTeams(tourney.bracket.rounds[0]);
         dynamoClient.storeTourney(tourney).then(s3Client.uploadNomination).then(() => {
             return tourney;
         });

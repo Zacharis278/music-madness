@@ -27,7 +27,7 @@ function storeTourney(tourney) {
             "user": tourney.user,
             "artist": tourney.artist,
             "name": tourney.artist,
-            "teams": tourney.teams,
+            "bracket": tourney.bracket,
             "vetoes": tourney.vetoes,
             "created": tourney.created
         }

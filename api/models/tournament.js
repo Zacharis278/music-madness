@@ -11,7 +11,7 @@ module.exports = class Tournament {
         this.artist = obj.artist;
         this.status = obj.status || 'nominated';
         this.name = obj.name || obj.artist; // for now
-        this.teams = obj.teams;
+        this.bracket = obj.bracket;
         this.vetoes = this.vetoes || [];
         this.created = obj.created || moment().toISOString()
     }
@@ -22,6 +22,12 @@ module.exports = class Tournament {
 
     getExpiry() {
         return moment(this.created).add(NOMINATION_EXPIRES_MINUTES, 'minutes');
+    }
+
+    getTeamsList() {
+        return this.bracket.rounds[0].map((teams) => {
+            return [teams[0].name, teams[1].name];
+        });
     }
 
     isNominationExpired() {

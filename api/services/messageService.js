@@ -1,5 +1,4 @@
 const moment = require('moment');
-const bracketService = require('./bracketService');
 const managerService = require('./managerService');
 const { WebClient } = require('@slack/client');
 const web = new WebClient(process.env.SLACK_TOKEN);
@@ -50,8 +49,8 @@ function postQueue() {
 function postNewTourney(tourney) {
     let params = {
         name: tourney.name,
-        tracks: bracketService.numberOfEntries(tourney.teams),
-        days: bracketService.calculateRuntimeDays(tourney.teams),
+        tracks: tourney.bracket.totalEntries,
+        days: tourney.bracket.runtimeDays,
         user: `<@${tourney.user}>`,
         link: BRACKET_URL
     };
@@ -69,7 +68,7 @@ function updateMessage(event, attachments) {
 }
 
 function postNomination(tourney) {
-    let runtimeMsg = `${bracketService.numberOfEntries(tourney.teams)} tracks over ${bracketService.calculateRuntimeDays(tourney.teams)} days`;
+    let runtimeMsg = `${tourney.bracket.totalEntries} tracks over ${tourney.bracket.runtimeDays} days`;
 
     let params = {
         artist: tourney.artist,
@@ -85,7 +84,7 @@ function postNomination(tourney) {
 }
 
 function nominationApprove(event, tourney) {
-    let runtimeMsg = `${bracketService.numberOfEntries(tourney.teams)} tracks over ${bracketService.calculateRuntimeDays(tourney.teams)} days`;
+    let runtimeMsg = `${tourney.bracket.totalEntries} tracks over ${tourney.bracket.runtimeDays} days`;
     let text = `New bracket has been added to the queue!\n*Artist* ${tourney.artist}\n*Added By* <@${tourney.user}>\n*Runtime* ${runtimeMsg}\n${BRACKET_URL}\n\n    _for queue details use \`/bot queue\`_`;
     return web.chat.postMessage(CHANNEL_ID, text).then(() => {
         return web.chat.update(event.message_ts, CHANNEL_ID, event.original_message.text, {attachments: []});
