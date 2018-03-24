@@ -10,6 +10,11 @@ exports.handler = function (event, context, callback) {
     // start a new
     managerService.newTournament().then((tourney) => {
         return messageService.postNewTourney(tourney);
+    }, (err) => {
+        if (err === 'ERR_EMPTY_QUEUE') {
+            messageService.queueEmptyError();
+            return Promise.resolve();
+        }
     }).then(() => {
         callback()
     });

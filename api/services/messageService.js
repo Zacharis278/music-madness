@@ -21,7 +21,8 @@ module.exports = {
     nominationShuffle: nominationShuffle,
     nominationVeto: nominationVeto,
     nominationVote: nominationVote,
-    updateMessage: updateMessage
+    updateMessage: updateMessage,
+    queueEmptyError: queueEmptyError
 };
 
 function postQueue() {
@@ -57,6 +58,10 @@ function postNewTourney(tourney) {
     let response = interpolateJSON(newTournamentTemplate, params);
 
     return web.chat.postMessage(CHANNEL_ID, response.text, {attachments: response.attachments});
+}
+
+function queueEmptyError() {
+    return web.chat.postMessage(CHANNEL_ID, 'Nothing is queue to post!  Add a new bracket with \'nominate\'');
 }
 
 function updateMessage(event, attachments) {

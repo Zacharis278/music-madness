@@ -84,6 +84,9 @@ function getBacklog() {
 function newTournament() {
     return dynamoClient.getQueuedTournys()
         .then((tournys) => { // pick random
+            if (tournys.length < 1) {
+                return Promise.reject('ERR_EMPTY_QUEUE');
+            }
             let pick = Math.floor(Math.random() * Math.floor(tournys.length));
             return(tournys[pick].id);
         })

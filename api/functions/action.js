@@ -62,10 +62,19 @@ function vetoNewTournament(event, userId, attachments) {
             if (!vetoes) { // submission removed by community
                 attachments[2] = null;
                 attachments[1] = {
-                    text: '*Bracket vetoed by the peanut gallery*\nnew bracket incoming...'
+                    text: '*Bracket vetoed by channel members*\nnew bracket incoming...'
                 };
-                // TODO: create alarm for new trigger
-                return messageService.updateMessage(event, attachments);
+
+                return messageService.updateMessage(event, attachments).then(() => {
+
+                    return managerService.newTournament().then(messageService.postNewTourney,
+                        (err) => {
+                            if (err === 'ERR_EMPTY_QUEUE') {
+                                messageService.queueEmptyError();
+                                return Promise.resolve();
+                            }
+                    });
+                });
             }
 
             let vetoTxt = 'vetoes: ';
