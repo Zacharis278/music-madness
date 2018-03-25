@@ -8,6 +8,14 @@ exports.handler = function (event, context, callback) {
     }
     else if (event.name === 'MATCHUP') {
 
+        managerService.nextMatchup().then((matchup) => {
+
+            return messageService.postMatchup(matchup);
+
+        }).then(() => {
+            callback();
+        });
+
     }
     else if (event.name === 'BRACKETS') {
 

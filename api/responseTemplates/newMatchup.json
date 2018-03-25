@@ -1,0 +1,26 @@
+{
+  "text": ":musical_note: *Today's Music Matchup* :musical_note: \nVoting closes at <!date^${closingTime}^{time}|{fallbackTime}>\n     • cast your vote at any time with `/moo vote`\n     • view current score with `/moo scoreboard`",
+  "attachments": [
+    {
+      "text": "*${roundTitle} - Match #${match}*\n${team1}\n          _versus_\n${team2}",
+      "color": "#3AA3E3",
+      "mrkdwn_in": ["text"],
+      "attachment_type": "default",
+      "callback_id": "matchup_vote",
+      "actions": [
+        {
+          "name": "vote",
+          "text": "Vote ${team1_short}",
+          "type": "button",
+          "value": "0"
+        },
+        {
+          "name": "vote",
+          "text": "Vote ${team2_short}",
+          "type": "button",
+          "value": "1"
+        }
+      ]
+    }
+  ]
+}

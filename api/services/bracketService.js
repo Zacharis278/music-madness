@@ -16,7 +16,9 @@ function generateBracket(searchTerm, limit) {
                 entries: [],
                 rounds: [
                     []
-                ]
+                ],
+                currentRound: -1,
+                currentMatchup: -1
             };
 
 

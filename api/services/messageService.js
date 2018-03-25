@@ -3,6 +3,7 @@ const managerService = require('./managerService');
 const { WebClient } = require('@slack/client');
 const web = new WebClient(process.env.SLACK_TOKEN);
 
+const matchupTemplate = require('../responseTemplates/newMatchup');
 const nominateTemplate = require('../responseTemplates/nominate');
 const newTournamentTemplate = require('../responseTemplates/newTournament');
 
@@ -21,7 +22,8 @@ module.exports = {
     nominationVeto: nominationVeto,
     nominationVote: nominationVote,
     updateMessage: updateMessage,
-    queueEmptyError: queueEmptyError
+    queueEmptyError: queueEmptyError,
+    postMatchup: postMatchup
 };
 
 function postQueue() {
@@ -56,6 +58,44 @@ function postNewTourney(tourney) {
     };
     let response = interpolateJSON(newTournamentTemplate, params);
 
+    return web.chat.postMessage(CHANNEL_ID, response.text, {attachments: response.attachments});
+}
+
+function postMatchup(matchup) {
+
+    let roundTitle;
+    switch (Math.log(matchup.roundTeams) / Math.log(2)) {
+        case 1:
+            roundTitle = 'Championship Round';
+            break;
+        case 2:
+            roundTitle = 'Final Four';
+            break;
+        case 3:
+            roundTitle = 'Elite Eight';
+            break;
+        case 4:
+            roundTitle = 'Sweet 16';
+            break;
+        default:
+            roundTitle = `Round of ${matchup.roundTeams}`;
+    }
+
+    let closingTime = moment().utc();
+    closingTime.add(1, 'days');
+    closingTime.set({hour:13,minute:0,second:0,millisecond:0});
+
+    let params = {
+        roundTitle: roundTitle,
+        match: matchup.match+1,
+        team1: matchup.team1,
+        team2: matchup.team2,
+        team1_short: matchup.team1.split(' - ')[0],
+        team2_short: matchup.team2.split(' - ')[0],
+        closingTime: closingTime.unix(),
+        fallbackTime: closingTime.toISOString()
+    };
+    let response = interpolateJSON(matchupTemplate, params);
     return web.chat.postMessage(CHANNEL_ID, response.text, {attachments: response.attachments});
 }
 

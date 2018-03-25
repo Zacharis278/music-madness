@@ -117,7 +117,7 @@ function getQueuedTournys() {
 function getTourneysByStatus(status) {
     let params = {
         TableName: 'Tournaments',
-        ProjectionExpression: "id, #stus",
+        ProjectionExpression: "id, #stus, bracket",
         FilterExpression: "#stus = :by_status",
         ExpressionAttributeNames: {
             "#stus": "status"

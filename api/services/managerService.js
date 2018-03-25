@@ -13,8 +13,32 @@ module.exports = {
     withdrawNomination: withdrawNomination,
     getBacklog: getBacklog,
     newTournament: newTournament,
-    addVeto: addVeto
+    addVeto: addVeto,
+    nextMatchup: nextMatchup
 };
+
+function nextMatchup() {
+    return dynamoClient.getTourneysByStatus('active').then((tourneys) => {
+        if (tourneys.length !== 1) {
+            console.log('Womp womp only expected 1 active tournament got ' + tourneys.length);
+        }
+        let bracket = tourneys[0].bracket;
+        let roundNo = bracket.currentRound > -1 ? bracket.currentRound : 0;
+        let matchNo = bracket.currentMatchup;
+
+        if (++matchNo > bracket.rounds[roundNo].length) {
+            matchNo = 0;
+            roundNo++;
+        }
+
+        return {
+            team1: bracket.rounds[roundNo][matchNo][0].name,
+            team2: bracket.rounds[roundNo][matchNo][1].name,
+            roundTeams: bracket.rounds[roundNo].length,
+            match: matchNo
+        }
+    });
+}
 
 function nominationsOpen() {
 
@@ -120,5 +144,5 @@ function addVeto(userId) {
                 return vetoes;
             }
         });
-    })
+    });
 }
