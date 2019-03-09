@@ -2,7 +2,7 @@ const message = require('./functions/message');
 const action = require('./functions/action');
 const trigger = require('./functions/trigger');
 
-let input = 'tvote';
+let input = 'trigger';
 
 let tokens = input.split(' ');
 
@@ -44,7 +44,25 @@ else if (tokens[0] === 'tvote') {
     });
 }
 else if (tokens[0] === 'trigger') {
-    trigger.handler();
+    trigger.handler({
+        name: 'MATCHUP'
+    });
+}
+else if (tokens[0] === 'vote') {
+    action.handler({
+        body: `user_id=U9JP7GWQK&payload=${JSON.stringify({
+            callback_id: 'matchup_vote',
+            original_message: {
+                text: 'PLACEHOLDER FOR ORIGINAL MSG by <@U9JP7GWQK>',
+                attachments: []
+            },
+            user: { id: 'U9JP7GWQK' },
+            actions: [{
+                value: tokens[1]
+            }],
+            message_ts: null
+        })}`
+    });
 }
 
 let event = {

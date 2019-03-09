@@ -1,6 +1,7 @@
 const s3Client = require('../clients/s3Client');
 const dynamoClient = require('../clients/dynamoClient');
 const Tournament = require('../models/tournament');
+const Vote = require('../models/vote');
 const bracketService = require('./bracketService');
 
 const CURRENT_NOMINATION_ID = 'CURRENT_NOMINATION';
@@ -14,7 +15,8 @@ module.exports = {
     getBacklog: getBacklog,
     newTournament: newTournament,
     addVeto: addVeto,
-    nextMatchup: nextMatchup
+    nextMatchup: nextMatchup,
+    voteMatchup: voteMatchup
 };
 
 function nextMatchup() {
@@ -152,4 +154,9 @@ function addVeto(userId) {
             }
         });
     });
+}
+
+function voteMatchup(userId, vote) {
+    vote = new Vote(userId, vote);
+    dynamoClient.addVote(vote);
 }

@@ -18,12 +18,21 @@ exports.handler = function (event, context, callback) {
     interactiveEvent.original_message.text = interactiveEvent.original_message.text.replace('/>', ''); // remove slack's url escape
     interactiveEvent.original_message.text = interactiveEvent.original_message.text.replace('<http', 'http');
 
-    if (interactiveEvent.callback_id === 'nomination_action') {
-        handleNominationAction(interactiveEvent, userId, action, attachments);
-    } else if (interactiveEvent.callback_id === 'start_tourney_action') {
-        // only option is to veto right now
-        vetoNewTournament(interactiveEvent, userId, attachments);
+    switch(interactiveEvent.callback_id) {
+        case 'nomination_action':
+            handleNominationAction(interactiveEvent, userId, action, attachments);
+            break;
+        case 'start_tourney_action':
+            // only option is to veto right now
+            vetoNewTournament(interactiveEvent, userId);
+            break;
+        case 'matchup_vote':
+            managerService.voteMatchup(userId, action);
+            break;
+        default:
+            console.log('got unknown action: ' + interactiveEvent.callback_id);
     }
+        
 
 };
 

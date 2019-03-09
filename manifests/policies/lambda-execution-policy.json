@@ -30,7 +30,8 @@
         "dynamodb:*"
       ],
       "Resource": [
-        "arn:aws:dynamodb:${aws_region}:${aws_account_id}:table/Tournaments"
+        "arn:aws:dynamodb:${aws_region}:${aws_account_id}:table/Tournaments",
+        "arn:aws:dynamodb:${aws_region}:${aws_account_id}:table/Votes"
       ]
     }
   ]

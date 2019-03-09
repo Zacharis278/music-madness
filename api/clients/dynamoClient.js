@@ -14,8 +14,20 @@ module.exports = {
     deleteTourneyById: deleteTourneyById,
     getQueuedTournys: getQueuedTournys,
     getTourneysByStatus: getTourneysByStatus,
-    addVeto: addVeto
+    addVeto: addVeto,
+    addVote: addVote
 };
+
+function addVote(vote) {
+    let params = {
+        TableName: 'Votes',
+        Item: vote
+    }
+
+    return put(params).then(() => {
+        return vote;
+    })
+}
 
 function storeTourney(tourney) {
     let params = {

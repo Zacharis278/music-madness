@@ -9,12 +9,12 @@ exports.handler = function (event, context, callback) {
     else if (event.name === 'MATCHUP') {
 
         managerService.nextMatchup().then((matchup) => {
-
             return messageService.postMatchup(matchup);
-
-        }).catch((e) => {
+        })
+        .then(() => callback())
+        .catch((e) => {
             console.log(e);
-        }).finally(() => callback());
+        });
 
     }
     else if (event.name === 'BRACKETS') {
@@ -26,9 +26,11 @@ exports.handler = function (event, context, callback) {
                 messageService.queueEmptyError();
                 return Promise.resolve();
             }
-        }).catch((e) => {
-            console.log(e)
-        }).finally(() => callback());
+        })
+        .then(() => callback())
+        .catch((e) => {
+            console.log(e);
+        });
     }
 
     // do we have results to report?
