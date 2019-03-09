@@ -13,10 +13,10 @@ function uploadNomination(tourney) {
         Key: "bracket.json"
     };
 
-    //return Promise.resolve();
+    if (process.env.DISABLE_S3_UPLOAD) return Promise.resolve();
 
     return new Promise((resolve, reject) => {
-
+    
         console.log('saving to s3');
         s3.putObject(params, function(err) {
             if (err) {

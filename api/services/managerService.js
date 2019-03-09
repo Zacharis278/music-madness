@@ -26,14 +26,21 @@ function nextMatchup() {
         let roundNo = bracket.currentRound > -1 ? bracket.currentRound : 0;
         let matchNo = bracket.currentMatchup;
 
-        if (++matchNo > bracket.rounds[roundNo].length) {
-            matchNo = 0;
-            roundNo++;
-        }
+        // skip bye rounds
+        do {
+            matchNo++;
+            team1 = bracket.rounds[roundNo][matchNo][0];
+            team2 = bracket.rounds[roundNo][matchNo][1];
+
+            if (matchNo > bracket.rounds[roundNo].length) {
+                matchNo = 0;
+                roundNo++;
+            }
+        } while (!team1.name || !team2.name)
 
         return {
-            team1: bracket.rounds[roundNo][matchNo][0].name,
-            team2: bracket.rounds[roundNo][matchNo][1].name,
+            team1: team1.name,
+            team2: team2.name,
             roundTeams: bracket.rounds[roundNo].length,
             match: matchNo
         }
