@@ -16,7 +16,8 @@ module.exports = {
     newTournament: newTournament,
     addVeto: addVeto,
     nextMatchup: nextMatchup,
-    voteMatchup: voteMatchup
+    voteMatchup: voteMatchup,
+    completeMatchup: completeMatchup,
 };
 
 function nextMatchup() {
@@ -31,21 +32,30 @@ function nextMatchup() {
         // skip bye rounds
         do {
             matchNo++;
-            team1 = bracket.rounds[roundNo][matchNo][0];
-            team2 = bracket.rounds[roundNo][matchNo][1];
-
-            if (matchNo > bracket.rounds[roundNo].length) {
+            if (matchNo >= bracket.rounds[roundNo].length) {
                 matchNo = 0;
                 roundNo++;
             }
-        } while (!team1.name || !team2.name)
 
-        return {
-            team1: team1.name,
-            team2: team2.name,
-            roundTeams: bracket.rounds[roundNo].length,
-            match: matchNo
-        }
+            team1 = bracket.rounds[roundNo][matchNo][0];
+            team2 = bracket.rounds[roundNo][matchNo][1];
+
+            if (!team2.name) { // Nope we need a win function in bracket service to figure this logic out
+                bracketService.addWinner(bracket, roundNo, team1)
+            }
+        } while (!team2.name)
+
+        bracket.currentRound = roundNo;
+        bracket.currentMatchup = matchNo;
+
+        return dynamoClient.storeTourney(tourneys[0]).then(() => {
+            return {
+                team1: team1.name,
+                team2: team2.name,
+                roundTeams: bracket.rounds[roundNo].length,
+                match: matchNo
+            }
+        })
     });
 }
 
@@ -159,11 +169,45 @@ function addVeto(userId) {
 function voteMatchup(userId, vote) {
     vote = new Vote(userId, vote);
     return dynamoClient.addVote(vote).then(() => {
-        return dynamoClient.getVotes().then((votes) => {
-            return votes.reduce((acc, curr) => {
-                acc[curr.vote]++;
-                return acc;
-            }, [0,0]);
-        });
+        return dynamoClient.getVotes();
+    });
+}
+
+function completeMatchup() {
+
+    return Promise.all([
+        dynamoClient.getVotes(),
+        dynamoClient.getTourneysByStatus('active')
+    ]).then(([votes, tourneys]) => {
+        if (tourneys.length !== 1) { // This is a dumb way to query this now
+            console.log('Womp womp only expected 1 active tournament got ' + tourneys.length);
+        }
+        // cleanup this jank ass shit
+        let tourney = new Tournament(tourneys[0]);
+        let bracket = tourney.bracket;
+
+        let matchup = bracket.rounds[bracket.currentRound][bracket.currentMatchup];
+        matchup[0].votes = votes[0];
+        matchup[1].votes = votes[1];
+
+        let winner, loser;
+        if (votes[0] > votes[1]) {
+            winner = matchup[0];
+            loser = matchup[1];
+        } else {
+            winner = matchup[1];
+            loser = matchup[0];
+        }
+        let result = {
+            winner: winner,
+            loser: loser,
+            match: bracket.currentMatchup,
+            roundTeams: bracket.rounds[bracket.currentRound].length
+        }
+
+        bracketService.addWinner(bracket, bracket.currentRound, winner);
+        s3Client.uploadNomination(tourney);
+        dynamoClient.clearVotes();
+        return dynamoClient.storeTourney(tourney);
     });
 }

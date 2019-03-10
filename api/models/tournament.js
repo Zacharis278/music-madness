@@ -30,6 +30,14 @@ module.exports = class Tournament {
         });
     }
 
+    getScores() {
+        return this.bracket.rounds.map((round) => {
+            return round.map((matchup) => {
+                return [matchup[0].votes, matchup[1].votes];
+            });
+        });
+    }
+
     isNominationExpired() {
         let now = moment();
         return now.isAfter(this.getExpiry());

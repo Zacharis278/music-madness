@@ -6,6 +6,7 @@ const web = new WebClient(process.env.SLACK_TOKEN);
 const matchupTemplate = require('../responseTemplates/newMatchup');
 const nominateTemplate = require('../responseTemplates/nominate');
 const newTournamentTemplate = require('../responseTemplates/newTournament');
+const resultsTemplate = require('../responseTemplates/matchResults');
 
 // configure this later
 const BRACKET_URL = 'http://mm-www.s3-website-us-east-1.amazonaws.com/';
@@ -23,7 +24,8 @@ module.exports = {
     nominationVote: nominationVote,
     updateMessage: updateMessage,
     queueEmptyError: queueEmptyError,
-    postMatchup: postMatchup
+    postMatchup: postMatchup,
+    postResult: postResult
 };
 
 function postQueue() {
@@ -96,6 +98,38 @@ function postMatchup(matchup) {
         fallbackTime: closingTime.toISOString()
     };
     let response = interpolateJSON(matchupTemplate, params);
+    return web.chat.postMessage(CHANNEL_ID, response.text, {attachments: response.attachments});
+}
+
+function postResult(result) {
+    let roundTitle;
+    switch (Math.log(result.roundTeams) / Math.log(2)) {
+        case 1:
+            roundTitle = 'Championship Round';
+            break;
+        case 2:
+            roundTitle = 'Final Four';
+            break;
+        case 3:
+            roundTitle = 'Elite Eight';
+            break;
+        case 4:
+            roundTitle = 'Sweet 16';
+            break;
+        default:
+            roundTitle = `Round of ${result.roundTeams}`;
+    }
+
+    let params = {
+        roundTitle: roundTitle,
+        link: BRACKET_URL,
+        match: result.match,
+        winner_name: result.winner.name,
+        loser_name: result.loser.name,
+        winner_votes: result.winner.votes,
+        loser_votes: result.loser.votes
+    }
+    let response = interpolateJSON(resultsTemplate, params);
     return web.chat.postMessage(CHANNEL_ID, response.text, {attachments: response.attachments});
 }
 

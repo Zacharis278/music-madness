@@ -4,6 +4,7 @@ let filterService = require('./filterService');
 module.exports = {
     generateBracket: generateBracket,
     shuffleTeams: shuffleTeams,
+    addWinner: addWinner
 };
 
 // TODO: WHAT IF WE SEED INITIAL MATCHUPS BY POPULARITY
@@ -75,6 +76,32 @@ function generateBracket(searchTerm, limit) {
             return bracket;
         });
     });
+}
+
+function addWinner(bracket, roundNumber, winner) {
+    
+    roundNumber++;
+
+    if (!bracket.rounds[roundNumber])
+        bracket.rounds[roundNumber] = [];
+    round = bracket.rounds[roundNumber];
+
+    if (round[round.length-1] && !round[round.length-1][1].name) {
+        round[round.length-1][1].name = winner.name;
+    } else {
+        round.push([
+            {
+                "name": winner.name,
+                "votes": null
+            },
+            {
+                "name": null,
+                "votes": null
+            }
+        ])
+    }
+
+    return bracket;
 }
 
 function calculateRuntimeDays(numTeams, numByes) {

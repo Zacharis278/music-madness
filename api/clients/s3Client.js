@@ -8,7 +8,10 @@ module.exports = {
 function uploadNomination(tourney) {
 
     let params = {
-        Body: JSON.stringify({teams:tourney.getTeamsList()}),
+        Body: JSON.stringify({
+            teams: tourney.getTeamsList(),
+            results: tourney.getScores()
+        }),
         Bucket: "mm-www",
         Key: "bracket.json"
     };

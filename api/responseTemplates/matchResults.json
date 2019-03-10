@@ -1,0 +1,15 @@
+{
+  "text": ":musical_note: *Final Score    ${winner_name} vs. ${loser_name}* :musical_note: \n${roundTitle} - Match #${match}\n_view standings:_ ${link}",
+  "attachments": [
+    {
+      "text": "*${winner_name}*\nHas won with ${winner_votes} votes",
+      "color": "#3AA3E3",
+      "mrkdwn_in": ["text"]
+    },
+	{
+      "text": "*${loser_name}*\nHas been eliminated with ${loser_votes} votes",
+      "color": "#E0421F",
+      "mrkdwn_in": ["text"]
+    }
+  ]
+}

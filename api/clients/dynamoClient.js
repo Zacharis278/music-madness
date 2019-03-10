@@ -17,6 +17,7 @@ module.exports = {
     addVeto: addVeto,
     addVote: addVote,
     getVotes: getVotes,
+    clearVotes: clearVotes
 };
 
 function getVotes() {
@@ -26,7 +27,10 @@ function getVotes() {
     };
 
     return scan(params).then((data) => {
-        return data.Items;
+        return data.Items.reduce((acc, curr) => {
+            acc[curr.vote]++;
+            return acc;
+        }, [0,0]);
     });
 }
 
@@ -39,6 +43,44 @@ function addVote(vote) {
     return put(params).then(() => {
         return vote;
     })
+}
+
+function clearVotes() {
+    let params = {
+        TableName: 'Votes',
+        ProjectionExpression: 'id',
+    };
+
+    return scan(params).then((data) => {
+
+        let deleteRequests = data.Items.map((vote) => {
+            return {
+                DeleteRequest: {
+                    Key: {
+                        id: vote.id
+                    },
+                }
+            }
+        });
+
+        params = {
+            RequestItems: {
+                "Votes": deleteRequests
+            }
+        }
+
+        return new Promise((resolve, reject) => {
+            docClient.batchWrite(params, function(err, data) {
+                if (err) {
+                    console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
+                    reject(err);
+                } else {
+                    console.log("Deleted item:", JSON.stringify(data, null, 2));
+                    resolve();
+                }
+            });
+        });
+    });
 }
 
 function storeTourney(tourney) {

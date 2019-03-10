@@ -2,7 +2,7 @@ const message = require('./functions/message');
 const action = require('./functions/action');
 const trigger = require('./functions/trigger');
 
-let input = 'vote 0';
+let input = 'trigger RESULTS';
 
 let tokens = input.split(' ');
 
@@ -45,7 +45,7 @@ else if (tokens[0] === 'tvote') {
 }
 else if (tokens[0] === 'trigger') {
     trigger.handler({
-        name: 'MATCHUP'
+        name: tokens[1]
     });
 }
 else if (tokens[0] === 'vote') {

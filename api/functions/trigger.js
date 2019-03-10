@@ -4,7 +4,9 @@ const managerService = require('../services/managerService');
 exports.handler = function (event, context, callback) {
 
     if (event.name === 'RESULTS') {
-
+        managerService.completeMatchup().then((result) => { 
+            return messageService.postResult(result)
+        });
     }
     else if (event.name === 'MATCHUP') {
 
