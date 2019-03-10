@@ -18,16 +18,17 @@ exports.handler = function (event, context, callback) {
     interactiveEvent.original_message.text = interactiveEvent.original_message.text.replace('/>', ''); // remove slack's url escape
     interactiveEvent.original_message.text = interactiveEvent.original_message.text.replace('<http', 'http');
 
+    // TODO: change this to function map
     switch(interactiveEvent.callback_id) {
         case 'nomination_action':
             handleNominationAction(interactiveEvent, userId, action, attachments);
             break;
         case 'start_tourney_action':
             // only option is to veto right now
-            vetoNewTournament(interactiveEvent, userId);
+            vetoNewTournament(interactiveEvent, userId, attachments);
             break;
         case 'matchup_vote':
-            managerService.voteMatchup(userId, action);
+            handleVoteAction(interactiveEvent, userId, action, attachments);
             break;
         default:
             console.log('got unknown action: ' + interactiveEvent.callback_id);
@@ -35,6 +36,15 @@ exports.handler = function (event, context, callback) {
         
 
 };
+
+function handleVoteAction(event, userId, vote, attachments) {
+    vote = Number(vote);
+    managerService.voteMatchup(userId, vote).then((votes) => {
+        attachments[0].actions[0].text = attachments[0].actions[0].text.replace(/\(\d+\)/, `(${votes[0]})`);
+        attachments[0].actions[1].text = attachments[0].actions[1].text.replace(/\(\d+\)/, `(${votes[1]})`);
+        messageService.updateMessage(event, attachments);
+    });
+}
 
 function handleNominationAction(event, userId, vote, attachments) {
 

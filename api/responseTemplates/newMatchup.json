@@ -10,13 +10,13 @@
       "actions": [
         {
           "name": "vote",
-          "text": "Vote ${team1_short}",
+          "text": "Vote ${team1_short} (0)",
           "type": "button",
           "value": "0"
         },
         {
           "name": "vote",
-          "text": "Vote ${team2_short}",
+          "text": "Vote ${team2_short} (0)",
           "type": "button",
           "value": "1"
         }

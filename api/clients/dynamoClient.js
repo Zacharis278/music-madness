@@ -15,8 +15,20 @@ module.exports = {
     getQueuedTournys: getQueuedTournys,
     getTourneysByStatus: getTourneysByStatus,
     addVeto: addVeto,
-    addVote: addVote
+    addVote: addVote,
+    getVotes: getVotes,
 };
+
+function getVotes() {
+    let params = {
+        TableName: 'Votes',
+        ProjectionExpression: 'vote',
+    };
+
+    return scan(params).then((data) => {
+        return data.Items;
+    });
+}
 
 function addVote(vote) {
     let params = {

@@ -2,7 +2,7 @@ const message = require('./functions/message');
 const action = require('./functions/action');
 const trigger = require('./functions/trigger');
 
-let input = 'trigger';
+let input = 'vote 0';
 
 let tokens = input.split(' ');
 
@@ -54,7 +54,12 @@ else if (tokens[0] === 'vote') {
             callback_id: 'matchup_vote',
             original_message: {
                 text: 'PLACEHOLDER FOR ORIGINAL MSG by <@U9JP7GWQK>',
-                attachments: []
+                attachments: [
+                    {actions: [
+                        {text: 'Choice A (0)'},
+                        {text: 'Choice B (0)'},
+                    ]}
+                ]
             },
             user: { id: 'U9JP7GWQK' },
             actions: [{

@@ -158,5 +158,12 @@ function addVeto(userId) {
 
 function voteMatchup(userId, vote) {
     vote = new Vote(userId, vote);
-    dynamoClient.addVote(vote);
+    return dynamoClient.addVote(vote).then(() => {
+        return dynamoClient.getVotes().then((votes) => {
+            return votes.reduce((acc, curr) => {
+                acc[curr.vote]++;
+                return acc;
+            }, [0,0]);
+        });
+    });
 }
