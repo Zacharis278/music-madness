@@ -7,6 +7,7 @@ const matchupTemplate = require('../responseTemplates/newMatchup');
 const nominateTemplate = require('../responseTemplates/nominate');
 const newTournamentTemplate = require('../responseTemplates/newTournament');
 const resultsTemplate = require('../responseTemplates/matchResults');
+const resultsTemplateFinal = require('../responseTemplates/finalResults');
 
 // configure this later
 const BRACKET_URL = 'http://mm-www.s3-website-us-east-1.amazonaws.com/';
@@ -25,7 +26,8 @@ module.exports = {
     updateMessage: updateMessage,
     queueEmptyError: queueEmptyError,
     postMatchup: postMatchup,
-    postResult: postResult
+    postResult: postResult,
+    postFinalWinner: postFinalWinner
 };
 
 function postQueue() {
@@ -129,8 +131,15 @@ function postResult(result) {
         winner_votes: result.winner.votes,
         loser_votes: result.loser.votes
     }
-    let response = interpolateJSON(resultsTemplate, params);
+
+    let template = result.isFinal ? resultsTemplateFinal : resultsTemplate;
+    let response = interpolateJSON(template, params);
     return web.chat.postMessage(CHANNEL_ID, response.text, {attachments: response.attachments});
+}
+
+function postFinalWinner(name) {
+    let msg = `:musical_note: *A New Champion Emerges* :musical_note:\n\n\n:tada: :tada:   ${name}   :tada: :tada:\n\n\n`
+    return web.chat.postMessage(CHANNEL_ID, msg);
 }
 
 function queueEmptyError() {

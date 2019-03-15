@@ -205,7 +205,13 @@ function completeMatchup() {
             roundTeams: bracket.rounds[bracket.currentRound].length*2
         }
 
-        bracketService.addWinner(bracket, bracket.currentRound, winner);
+        if (bracket.rounds[bracket.currentRound].length === 1) {
+            tourney.setStatus('complete');
+            result.isFinal = true;
+        } else {
+            bracketService.addWinner(bracket, bracket.currentRound, winner);
+        }
+        
         s3Client.uploadNomination(tourney);
         dynamoClient.clearVotes();
         return dynamoClient.storeTourney(tourney).then(() => {
