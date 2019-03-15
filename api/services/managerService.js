@@ -52,7 +52,7 @@ function nextMatchup() {
             return {
                 team1: team1.name,
                 team2: team2.name,
-                roundTeams: bracket.rounds[roundNo].length,
+                roundTeams: bracket.rounds[roundNo].length*2,
                 match: matchNo
             }
         })
@@ -202,12 +202,14 @@ function completeMatchup() {
             winner: winner,
             loser: loser,
             match: bracket.currentMatchup,
-            roundTeams: bracket.rounds[bracket.currentRound].length
+            roundTeams: bracket.rounds[bracket.currentRound].length*2
         }
 
         bracketService.addWinner(bracket, bracket.currentRound, winner);
         s3Client.uploadNomination(tourney);
         dynamoClient.clearVotes();
-        return dynamoClient.storeTourney(tourney);
+        return dynamoClient.storeTourney(tourney).then(() => {
+            return result;
+        });
     });
 }

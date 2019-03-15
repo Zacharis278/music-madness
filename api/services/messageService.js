@@ -66,17 +66,17 @@ function postNewTourney(tourney) {
 function postMatchup(matchup) {
 
     let roundTitle;
-    switch (Math.log(matchup.roundTeams) / Math.log(2)) {
-        case 1:
+    switch (matchup.roundTeams) {
+        case 2:
             roundTitle = 'Championship Round';
             break;
-        case 2:
+        case 4:
             roundTitle = 'Final Four';
             break;
-        case 3:
+        case 8:
             roundTitle = 'Elite Eight';
             break;
-        case 4:
+        case 16:
             roundTitle = 'Sweet 16';
             break;
         default:
@@ -103,17 +103,17 @@ function postMatchup(matchup) {
 
 function postResult(result) {
     let roundTitle;
-    switch (Math.log(result.roundTeams) / Math.log(2)) {
-        case 1:
+    switch (result.roundTeams) {
+        case 2:
             roundTitle = 'Championship Round';
             break;
-        case 2:
+        case 4:
             roundTitle = 'Final Four';
             break;
-        case 3:
+        case 8:
             roundTitle = 'Elite Eight';
             break;
-        case 4:
+        case 16:
             roundTitle = 'Sweet 16';
             break;
         default:
@@ -123,7 +123,7 @@ function postResult(result) {
     let params = {
         roundTitle: roundTitle,
         link: BRACKET_URL,
-        match: result.match,
+        match: result.match+1,
         winner_name: result.winner.name,
         loser_name: result.loser.name,
         winner_votes: result.winner.votes,
