@@ -35,7 +35,7 @@ function generateBracket(searchTerm, limit) {
             });
 
             // limit to 64 initial matchups for now
-            if (!limit) limit = Math.min(nearestPow2(bracketEntries.length), 128);
+            if (!limit) limit = Math.min(nearestPow2(bracketEntries.length), 8);
 
             if (bracketEntries.length > limit) {
                 //cullLeastPopular(bracketEntries, limit);
